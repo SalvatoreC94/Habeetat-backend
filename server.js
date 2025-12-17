@@ -3,37 +3,47 @@ const app = express();
 const port = 3000;
 const authorsProvider = require('./providers/authorsProvider');
 
- app.get('/authors', (req, res) => {
-        //res.send('Hello, World!');
-     res.json(authorsProvider.getAllAuthors());
- });
-
-app.get('/authors/id', (req, res) => {
-    const { id } = req.params;
-    console.log(id);
-    res.json(authorsProvider.getAuthorById(parseInt(id)));
-});
+app.use(express.json());
 
 app.get('/authors', (req, res) => {
     const { age } = req.query;
-    console.log(age);
-    res.json(authorsProvider.getAuthorsByfilter(parseInt(age)));
+    
+    if (age) {
+        const filtered = authorsProvider.getAuthorsByfilter(parseInt(age));
+        return res.json(filtered);
+    }
+    
+    res.json(authorsProvider.getAllAuthors());
 });
 
 app.get('/authors/:id', (req, res) => {
     const { id } = req.params;
+    const author = authorsProvider.getAuthorById(parseInt(id));
+    
+    
+    res.json(author);
 });
 
 app.patch('/authors/:id', (req, res) => {
     const { id } = req.params;
     const { name, email } = req.body;
+    
+    res.json({ 
+        message: 'Aggiornato',
+        id: parseInt(id),
+        updates: { name, email }
+    });
 });
 
 app.delete('/authors/:id', (req, res) => {
     const { id } = req.params;
+    
+    res.json({ 
+        message: 'Eliminato',
+        id: parseInt(id)
+    });
 });
 
 app.listen(port, () => {
-console.log(`test app listening on port ${port}`);
+    console.log(`Server in ascolto su http://localhost:${port}`);
 });
-
